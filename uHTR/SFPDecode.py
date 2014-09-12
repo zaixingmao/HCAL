@@ -12,35 +12,58 @@ def formatOutput(input):
 
 def decoder(words, bxCounter):
     E1 = int(words[0][2:4], 16)
+    T1 = int(words[2][3:4], 16) & 1
     E3 = int(words[0][0:2], 16)
+    T3 = int(words[2][1:2], 16) & 1
     E5 = int(words[1][2:4], 16)
+    T5 = int(words[3][3:4], 16) & 1
     E7 = int(words[1][0:2], 16)
+    T7 = int(words[3][1:2], 16) & 1
+
 
     E4 = int(words[2], 16) >> 9
     E4_lastBit = (int(words[4], 16) >> 8) & 1
     E4 += (E4_lastBit << 7)
+    T4 = (int(words[4][1:2], 16) >> 1) & 1
 
     E2 = int(words[2][2:4], 16) >> 1
     E2_lastBit = int(words[4], 16) & 1
     E2 += (E2_lastBit << 7)
+    T2 = (int(words[4][3:4], 16) >> 1) & 1
 
     E8 = int(words[3], 16) >> 9
     E8_lastBit = (int(words[5], 16) >> 8) & 1
     E8 += (E8_lastBit << 7)
+    T8 = (int(words[5][1:2], 16) >> 1) & 1
 
     E6 = int(words[3][2:4], 16) >> 1
     E6_lastBit = int(words[5], 16) & 1
     E6 += (E6_lastBit << 7)
+    T6 = (int(words[5][3:4], 16) >> 1) & 1
 
-    print "BX%i\t%s %s %s %s %s %s %s %s" %(bxCounter,
-                                            formatOutput(E1),
-                                            formatOutput(E2),
-                                            formatOutput(E3),
-                                            formatOutput(E4),
-                                            formatOutput(E5),
-                                            formatOutput(E6),
-                                            formatOutput(E7),
-                                            formatOutput(E8))
+    BC0 = int(words[4][0:1],16)>>3
+    BC0 += (int(words[5][0:1], 16)>>3)<<1
+    BC0 += (int(words[4][2:3], 16)>>3)<<2
+    BC0 += (int(words[5][2:3], 16)>>3)<<3
+
+    Ham1 = (int(words[4][2:4], 16)>>2) & 0x1f
+    Ham2 = (int(words[4][0:2], 16)>>2) & 0x1f
+    Ham3 = (int(words[5][2:4], 16)>>2) & 0x1f
+    Ham4 = (int(words[5][0:2], 16)>>2) & 0x1f
+
+    print "%i\t%s   %i%s %i%s %i%s %i%s %i%s %i%s %i%s %i%s   %s %s %s %s" %(bxCounter, BC0,
+                         T1, formatOutput(E1),
+                         T2, formatOutput(E2),
+                         T3, formatOutput(E3),
+                         T4, formatOutput(E4),
+                         T5, formatOutput(E5),
+                         T6, formatOutput(E6),
+                         T7, formatOutput(E7),
+                         T8, formatOutput(E8),
+                         formatOutput(Ham1),
+                         formatOutput(Ham2),
+                         formatOutput(Ham3),
+                         formatOutput(Ham4))
 
 
 def decode(lines, pStart, pEnd, preFix, bxCounter):
@@ -57,9 +80,9 @@ def SFPDecode(location, startFrom):
     startDecode = False
     i = 0
     bxCounter = 0
-    print "-------------------------------"
-    print "BX\tE1 E2 E3 E4 E5 E6 E7 E8"
-    print "-------------------------------"
+    print "---------------------------------------------------------"
+    print "BX     BC0   E1  E2  E3  E4  E5  E6  E7  E8  Ham1 2  3  4"
+    print "---------------------------------------------------------"
 
     while i < len(lines):
         current_line = lines[i]
