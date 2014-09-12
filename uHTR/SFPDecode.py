@@ -80,7 +80,7 @@ def decode(lines, pStart, pEnd, bxCounter):
         words.append(current_line)
     decoder(words, bxCounter)
     
-def SFPDecode(location, startFrom):
+def SFPDecode(location, startFrom, maxBx=-1):
     lines = open(location, "r").readlines()
     startDecode = False
     i = 0
@@ -98,12 +98,16 @@ def SFPDecode(location, startFrom):
             decode(lines, i, i+6, bxCounter)
             bxCounter += 1
             i += 5
+            if maxBx > 0 and bxCounter == maxBx:
+                break
         i += 1
 
 def opts():
     parser = optparse.OptionParser()
     parser.add_option("--sample", dest="location", default="", help="location for dump file")
     parser.add_option("--startFrom", dest="startFrom", default=0, help="start of decoding")
+    parser.add_option("--maxBX", dest="maxBX", default=-1, help="max number of BXs to print out")
+
     options, args = parser.parse_args()
     if not options.location:
         parser.print_help()
@@ -114,4 +118,5 @@ if __name__ == "__main__":
     options = opts()
     location = options.location
     startFrom = int(options.startFrom)
-    SFPDecode(location, startFrom)
+    maxBX = int(options.maxBX)
+    SFPDecode(location, startFrom, maxBX)
