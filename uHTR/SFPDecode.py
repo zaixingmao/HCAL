@@ -1,9 +1,16 @@
 #!/usr/bin/env python
 import optparse
+import sys
 
 #run like: python SFPDecode.py --sample=/Users/zmao/Downloads/dump.txt --startFrom=1
 
-def decoder(words):
+def formatOutput(input):
+    hexForm = str(hex(input))
+    if len(hexForm) == 3:
+        hexForm = '0x0'+ hexForm[2:3]
+    return hexForm[2:]
+
+def decoder(words, bxCounter):
     E1 = int(words[0][2:4], 16)
     E3 = int(words[0][0:2], 16)
     E5 = int(words[1][2:4], 16)
@@ -25,42 +32,34 @@ def decoder(words):
     E6_lastBit = int(words[5], 16) & 1
     E6 += (E6_lastBit << 7)
 
-    print 'E1: %s' %hex(E1)
-    print 'E2: %s' %hex(E2)
-    print 'E3: %s' %hex(E3)
-    print 'E4: %s' %hex(E4)
-    print 'E5: %s' %hex(E5)
-    print 'E6: %s' %hex(E6)
-    print 'E7: %s' %hex(E7)
-    print 'E8: %s' %hex(E8)
+    print "BX%i\t%s %s %s %s %s %s %s %s" %(bxCounter,
+                                            formatOutput(E1),
+                                            formatOutput(E2),
+                                            formatOutput(E3),
+                                            formatOutput(E4),
+                                            formatOutput(E5),
+                                            formatOutput(E6),
+                                            formatOutput(E7),
+                                            formatOutput(E8))
 
-def decode(lines, pStart, pEnd, preFix):
+
+def decode(lines, pStart, pEnd, preFix, bxCounter):
     counter = 0
     words = []
     for iLine in range(pStart, pEnd):
         current_line = lines[iLine]
         current_line = current_line[preFix:preFix+4]
         words.append(current_line)
-    decoder(words)
+    decoder(words, bxCounter)
     
-
-def opts():
-    parser = optparse.OptionParser()
-    parser.add_option("--sample", dest="location", default=" ", help="location for dump file")
-    parser.add_option("--startFrom", dest="startFrom", default=0, help="start of decoding")
-    options, args = parser.parse_args()
-
-    return options
-
-if __name__ == "__main__":
-    options = opts()
-    location = options.location
-    startFrom = int(options.startFrom)
-
 def SFPDecode(location, startFrom):
     lines = open(location, "r").readlines()
     startDecode = False
     i = 0
+    bxCounter = 0
+    print "-------------------------------"
+    print "BX\tE1 E2 E3 E4 E5 E6 E7 E8"
+    print "-------------------------------"
 
     while i < len(lines):
         current_line = lines[i]
@@ -72,7 +71,23 @@ def SFPDecode(location, startFrom):
         if startDecode:
             if i+6 >= len(lines):
                 break
-            print ''
-            decode(lines, i, i+6, prefixEndPosition)
+            decode(lines, i, i+6, prefixEndPosition, bxCounter)
+            bxCounter += 1
             i += 5
         i += 1
+
+def opts():
+    parser = optparse.OptionParser()
+    parser.add_option("--sample", dest="location", default="", help="location for dump file")
+    parser.add_option("--startFrom", dest="startFrom", default=0, help="start of decoding")
+    options, args = parser.parse_args()
+    if not options.location:
+        parser.print_help()
+        sys.exit(1)
+    return options
+
+if __name__ == "__main__":
+    options = opts()
+    location = options.location
+    startFrom = int(options.startFrom)
+    SFPDecode(location, startFrom)
