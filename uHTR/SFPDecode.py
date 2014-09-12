@@ -70,12 +70,13 @@ def decoder(words, bxCounter):
                          formatOutput(Ham4))
 
 
-def decode(lines, pStart, pEnd, preFix, bxCounter):
+def decode(lines, pStart, pEnd, bxCounter):
     counter = 0
     words = []
     for iLine in range(pStart, pEnd):
         current_line = lines[iLine]
-        current_line = current_line[preFix:preFix+4]
+        #chop off prefix
+        current_line = current_line.split()[1][4:8]
         words.append(current_line)
     decoder(words, bxCounter)
     
@@ -88,17 +89,13 @@ def SFPDecode(location, startFrom):
     print "BX       BC0    E1  E2  E3  E4  E5  E6  E7  E8  Ham1 2  3  4"
     print "---------------------------------------------------------"
 
-    while i < len(lines):
-        current_line = lines[i]
-        #chop off prefix
-        prefixEndPosition = 8
-        current_line = current_line[prefixEndPosition:prefixEndPosition+4]
+    while i < len(lines): 
         if i == startFrom:
             startDecode = True
         if startDecode:
             if i+6 >= len(lines):
                 break
-            decode(lines, i, i+6, prefixEndPosition, bxCounter)
+            decode(lines, i, i+6, bxCounter)
             bxCounter += 1
             i += 5
         i += 1
