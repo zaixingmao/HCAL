@@ -43,6 +43,7 @@ def decode(lines, pStart, pEnd, preFix):
         words.append(current_line)
     decoder(words)
     
+
 def opts():
     parser = optparse.OptionParser()
     parser.add_option("--sample", dest="location", default=" ", help="location for dump file")
@@ -51,25 +52,27 @@ def opts():
 
     return options
 
-options = opts()
-location = options.location
-startFrom = int(options.startFrom)
+if __name__ == "__main__":
+    options = opts()
+    location = options.location
+    startFrom = int(options.startFrom)
 
-lines = open(location, "r").readlines()
-startDecode = False
-i = 0
+def SFPDecode(location, startFrom):
+    lines = open(location, "r").readlines()
+    startDecode = False
+    i = 0
 
-while i < len(lines):
-    current_line = lines[i]
-    #chop off prefix
-    prefixEndPosition = 8
-    current_line = current_line[prefixEndPosition:prefixEndPosition+4]
-    if i == startFrom:
-        startDecode = True
-    if startDecode:
-        if i+6 >= len(lines):
-            break
-        print ''
-        decode(lines, i, i+6, prefixEndPosition)
-        i += 5
-    i += 1
+    while i < len(lines):
+        current_line = lines[i]
+        #chop off prefix
+        prefixEndPosition = 8
+        current_line = current_line[prefixEndPosition:prefixEndPosition+4]
+        if i == startFrom:
+            startDecode = True
+        if startDecode:
+            if i+6 >= len(lines):
+                break
+            print ''
+            decode(lines, i, i+6, prefixEndPosition)
+            i += 5
+        i += 1
