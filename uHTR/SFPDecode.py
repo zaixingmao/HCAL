@@ -46,6 +46,10 @@ def decoder(words, bxCounter):
     BC0 += (int(words[4][2:3], 16)>>3)<<2
     BC0 += (int(words[5][2:3], 16)>>3)<<3
 
+    BC0 = "{0:b}".format(BC0)
+    while len(BC0) < 4:
+        BC0 = "0" + BC0
+
     Ham1 = (int(words[4][2:4], 16)>>2) & 0x1f
     Ham2 = (int(words[4][0:2], 16)>>2) & 0x1f
     Ham3 = (int(words[5][2:4], 16)>>2) & 0x1f
@@ -81,7 +85,7 @@ def SFPDecode(location, startFrom):
     i = 0
     bxCounter = 0
     print "---------------------------------------------------------"
-    print "BX     BC0   E1  E2  E3  E4  E5  E6  E7  E8  Ham1 2  3  4"
+    print "BX       BC0    E1  E2  E3  E4  E5  E6  E7  E8  Ham1 2  3  4"
     print "---------------------------------------------------------"
 
     while i < len(lines):
